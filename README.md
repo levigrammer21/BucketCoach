@@ -1,43 +1,61 @@
-# Bucket Coach 1.0.0
+# Bucket Coach 1.1 — personal automatic scouting
 
-Mobile-first baseball scouting workspace. A buildless website: no package install or custom backend is required.
+[**Start Bucket Coach in a free GitHub Codespace**](https://codespaces.new/levigrammer21/BucketCoach?quickstart=1)
 
-## Run / publish
+1. Choose **Create codespace**. Keep the default two-core machine.
+2. Wait for setup to install the browser. The app opens automatically on port **3000**. If it doesn't, open the **Ports** tab and choose **Open in Browser** for **Open Bucket Coach**.
+3. In Bucket Coach, choose **Connect GameChanger**. Tap the GameChanger field in the browser image, enter its text in the box underneath and tap **Send text**. Tap GameChanger's own buttons in the image. Complete any verification code in this window.
+4. Choose **Done — continue scouting**, then **Scout a link**. Paste a team or game share link. Results and player rows flow directly into the report; no extension or file import is required.
 
-The GitHub-ready download has all website files inside one Bucket-Coach folder. Upload that folder's CONTENTS into your repository root. Enable GitHub Pages from the root. Relative assets work under a repository subpath. On HTTPS, the shell caches for offline reopening after an initial online visit. Browser data is local to each browser/origin; hosted Sites and GitHub Pages do not share saved work. Export a backup before moving hosts or devices.
+The app now includes its own server and browser collector. The public GitHub Pages / static Sites address cannot run that server: use the Codespace app URL for automatic scouting. Its connection screen links to the Codespace launcher rather than pretending automatic collection is available on a static host.
 
-## Included
+## What is implemented
 
-- Multiple saved teams and GameChanger team links.
-- Season, last-five, last-ten and opponent filters.
-- Team records, scoring, run differential, shared-opponent comparisons and trends.
-- Player batting and pitching profiles, per-game logs and notes.
-- Weighted AVG, OBP, SLG and OPS using only complete-input rows; seven-inning ERA, WHIP, BB% and K% using complete relevant inputs. Missing data remains blank. IP uses outs, not decimal arithmetic.
-- Team/player spray charts with contact type and physical field direction.
-- Bunt attempts and explicitly tagged successes; manual tap-to-chart contacts.
-- Source coverage, partial-data labels and small-sample indicators.
-- Coaching plans, notes, printable reports / browser Save as PDF.
-- CSV/JSON imports with preview, conservative merge, backup/restore, CSV exports.
-- Experimental Chrome/Chromebook collection companion. See companion/README.md.
+- An in-app interactive GameChanger browser view for your direct sign-in.
+- A persistent browser profile on the personal server. No GameChanger password is hardcoded, committed, returned through the API, or logged by Bucket Coach.
+- Team/game shared-link input; a game link identifies its team, then the app scans that team's accessible completed schedule.
+- One scouting job at a time, progress, stop/resume, sign-in-required handling and collection notes.
+- Rendered visible schedule and box-score extraction. Blur/visibility checks and team-label verification reject locked or unverified player rows.
+- Automatically saved reports and workspace on the server, with local backup fallback.
+- Multiple team reports, weighted hitting/pitching metrics, player logs, comparisons, manual/imported spray contacts, bunt tags, notes and printable reports from 1.0.
+- Android Web Share target when installed as a supported web app.
 
-## Seed evidence
+## Live verification status
 
-21 public Outlaws results captured October 22, 2026 (14–7, 301 runs scored, 157 allowed). Eight complete batting rows from the user's screenshot of October 20 vs Sandlot. This player's evidence is explicitly partial and not representative of season totals. No fabricated pitching or spray records are included.
+**Successful signed-in extraction against GameChanger is still unverified.** The previous cloud browser session returned an account-loading error. This release implements the actual server workflow rather than assuming a popup or paid subscription connects the websites. Live GameChanger page structure, permissions, human verification and account restrictions may still require changes after testing in your Codespace.
 
-## Important integration boundary
+Verified locally: parser/math checks; backend HTTP and workspace persistence; automatic collection-to-report using a clearly identified fixture browser; pause for locked player rows; in-app connection viewer; resume and automatic report population without file import. Fixture tests do not establish GameChanger compatibility.
 
-The website is not connected to GameChanger authentication and does not receive your password. A signed-in browser session is not automatically shared with another website. The included extension attempts to read visible schedule and box-score tables in your own Chrome session and export JSON. The DOM extractor passed controlled local fixtures, including rejecting blurred/opponent rows. Live end-to-end collection from a successfully signed-in GameChanger account remains UNVERIFIED because the tested account session returned an account-loading error. Paid subscriptions and team permissions do not guarantee automatic integration support. It is not an official GameChanger integration. Their published terms restrict automated access; provider authorization is needed for automated collection.
+The collector reads rendered page data. It does not use private APIs or unlock restricted content. It currently collects final scores and recognized player-table columns. It does **not** claim to collect full play-by-play, spray coordinates, video or all supplemental stat lines. Missing optional stats remain unknown. All captured player boxes are conservatively marked partial until reviewed. Spray/bunt analysis requires observed or imported contact records. Team memberships and subscription access determine what you can see; the integration is not approved or endorsed by GameChanger. Their published terms restrict automated access; seek provider authorization for automated collection.
 
-The collector currently imports schedules, final scores and recognized box-score columns, not spray coordinates, full play-by-play or video. Spray, batted-ball mix and bunt analysis become available from charted or imported contact records. The website never invents them. This is a two-step collect/import workflow, not unattended link-only synchronization. Standard Chrome on Android and Safari on iPad do not run the companion; collection requires a compatible Chrome desktop/Chromebook, then the JSON can be transferred to mobile.
+## Free testing and saved data
 
-## Imports
+GitHub personal accounts include limited free Codespaces compute/storage. Stop the Codespace when finished; this is not permanent free production hosting. Keep port 3000 **private**. No application account is added because the private Codespaces port is the access boundary for this personal test.
 
-JSON: {"teamName":"…","games":[…]}. Each game needs date (YYYY-MM-DD), opponent, runs and allowed. Optional stable id, source, sourceUrl, partial, batting, pitching and contacts. Player rows need name; number and position are optional. Optional numeric fields: ab,r,h,rbi,bb,so,doubles,triples,hr,sb,cs,hbp,sf,ip,er,pitches,bf. Omit unknown fields or use null, never substitute 0. Contacts need x,y (0–100), type (GB,LD,FB,BUNT,OTHER), outcome (HIT,OUT,ERROR,SAC,OTHER), with optional name,number,buntSuccess,source. X increases left to right, Y increases downward; home is roughly x=50,y=92.2. Locations can describe contact or recorded fielding locations; note the convention in source.
+Your server workspace, job progress and browser profile are in `.bucket-coach-data/`, excluded from Git and static serving. They persist across an ordinary stop/restart of the same Codespace. Deleting the Codespace deletes its data. Download a backup before deleting it. Browser profile data is sensitive even though it is not a saved plain-text password. Use **Forget GameChanger session** to clear the browser profile without removing reports.
 
-CSV: date,opponent,runs,allowed are required. Add game_id for stable identity and doubleheaders. For player rows include kind (batting/pitching), name,number and any optional numeric fields above. Repeated rows with the same game_id are combined into one game. Native GameChanger season CSVs may require reshaping into this per-game format; a sample template is downloadable inside the app. A unique stable ID distinguishes otherwise identical doubleheader results. Without IDs, games merge by date/opponent/final score. Matching imports with nonempty player/contact arrays replace that game's corresponding row sets; empty imports preserve existing richer rows.
+## Local run
 
-Backups include all teams, games and notes. Restore is an explicit replacement of the local workspace. Keep backups before deleting browser data. No cloud sync, multiplayer collaboration or server account is implemented.
+Node 22 or later:
 
-## Checks
+```sh
+npm ci
+npm run setup:browser
+npm start
+```
 
-Node: node tests/core.test.cjs (in the source checkout). The delivered website does not require Node. Verified import preview/commit, tap-to-chart save, player metrics, mobile-width spray rendering, matching-game merges and local DOM extraction fixtures. Signed-in live GameChanger capture and a physical device install are not verified.
+Open `http://localhost:3000`. On Linux, browser setup installs system dependencies and may require sudo. Codespaces handles the setup commands automatically. Optionally set `PORT` and `BUCKET_COACH_DATA_DIR`. The server is a personal prototype; do not expose it as a public multiuser service.
+
+## Development
+
+```sh
+npm test
+```
+
+API/browser implementation is in `server/`. The app entrypoints remain at repository root for GitHub Pages compatibility. The development Sites checkout places website assets under `dist/`; the server automatically detects either layout. `.devcontainer/devcontainer.json` configures setup and startup; `scripts/start-codespace.sh` launches the app after Codespace startup.
+
+## Seed evidence and import formats
+
+Outlaws seed: 21 public game results captured October 22, 2026, plus the eight complete batting rows visible in your screenshot from one game. Those are the only seeded player rows. No fabricated spray/pitching data is included. Automatic scouting merges matching games by stable ID or fallback date/opponent/final score.
+
+Backup/import tools remain available for recovery, but are not needed for automatic collection. See DATA-FORMAT.md for JSON examples. Existing 1.0 device-local reports can be moved to the server using a backup if needed.
